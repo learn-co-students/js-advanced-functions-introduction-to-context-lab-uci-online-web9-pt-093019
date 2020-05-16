@@ -32,8 +32,8 @@ function createTimeOutEvent(empObj, timeStamp) {
 }
 
 function hoursWorkedOnDate(empObj, date) {
-    timeO = empObj.timeOutEvents.find(x => x.date == date) 
-    timeI = empObj.timeInEvents.find(x => x.date == date)
+    const timeO = empObj.timeOutEvents.find(x => x.date == date) 
+    const timeI = empObj.timeInEvents.find(x => x.date == date)
     return (timeO.hour - timeI.hour)/100
 }
 
@@ -42,7 +42,7 @@ function wagesEarnedOnDate(empObj, date) {
 }
 
 function allWagesFor(empObj) {
-    dates = empObj.timeInEvents.map(x => x.date)
+    const dates = empObj.timeInEvents.map(x => x.date)
     return dates.map(x => wagesEarnedOnDate(empObj, x)).reduce(function(total, current) {
         return total += current 
     })
