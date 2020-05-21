@@ -21,36 +21,66 @@ function createEmployeeRecords(arry) {
 
 function createTimeInEvent(empRecord, dateStamp) {
     const dateSplit = dateStamp.split(" ")
-    // const timeConstr = dateSplit[1].substring(0,2)
-    // const dateFmt = dateSplit[0] + 'T' + `${timeConstr}:00:00-08:00`
-    // const dateObj = new Date(dateFmt)
-
-    empRecord.timeInEvents.push({
-        type: 'TimeIn',
-        hour: parseInt(dateSplit[1]),
-        date: dateSplit[0]
-    })
-
-    return empRecord
+    const timeConstr = dateSplit[1].substring(0,4)
+    const dateFmt = dateSplit[0] + 'T' + `${timeConstr.substring(0,2)}:${timeConstr.substring(2,4)}:00-08:00`
+    const dateObj = new Date(dateFmt)
+    
+    try {
+        if (!Date.parse(dateObj)) {
+            throw Error('Invalid Date!!')
+        }
+        else {        
+            empRecord.timeInEvents.push({
+                type: 'TimeIn',
+                hour: parseInt(dateSplit[1]),
+                date: dateSplit[0],
+                dateObj: dateObj
+            })
+        
+            return empRecord
+        }
+    }
+    catch(err) {
+        alert(err)
+    }  
+    
 }
 
 function createTimeOutEvent(empRecord, dateStamp) {
     const dateSplit = dateStamp.split(" ")
-    
+    const timeConstr = dateSplit[1].substring(0,4)
+    const dateFmt = dateSplit[0] + 'T' + `${timeConstr.substring(0,2)}:${timeConstr.substring(2,4)}:00-08:00`
+    const dateObj = new Date(dateFmt)
+
     empRecord.timeOutEvents.push({
         type: 'TimeOut',
         hour: parseInt(dateSplit[1]),
-        date: dateSplit[0]
+        date: dateSplit[0],
+        dateObj: dateObj
     })
 
     return empRecord
 }
 
 function hoursWorkedOnDate(empRecord, formDate) {
-    const timeOut = empRecord.timeOutEvents.find(event => event.date === formDate).hour
-    const timeIn = empRecord.timeInEvents.find(event => event.date === formDate).hour
     
-    return (timeOut - timeIn) / 100
+    const timeIn = empRecord.timeInEvents.find(event => event.date === formDate)
+    const timeOut = empRecord.timeOutEvents.find(event => event.date === formDate)
+
+    if (timeIn) {
+        try {
+            if (!timeOut) {
+                throw `Missing time out record for date: ${formDate}!`
+            }
+        }
+        catch(err) {
+            alert(err)
+        }
+    }
+    
+    if (timeIn && timeOut) {
+        return (timeOut.dateObj.getTime() - timeIn.dateObj.getTime())/(1000*60*60)
+    }
 }
 
 function wagesEarnedOnDate(empRecord, formDate) {
@@ -85,14 +115,6 @@ function calculatePayroll(empRecordsArry) {
     })
 }
 
-// work on adding map function where possible?
-
-// work on adding challenges:
-//    exception handling
-//    date handling and errors
-
-
-
 let twoRows = [
     ["moe", "sizlak", "barkeep", 2],
     ["bartholomew", "simpson", "scamp", 3]
@@ -101,8 +123,8 @@ let twoRows = [
 createEmployeeRecords(twoRows)
 createEmployeeRecord(['Andrew', 'Capp', 'DOF', 15.00])
 let empRecord = createEmployeeRecord(['Andrew', 'Capp', 'DOF', 15.00])
-createTimeInEvent(empRecord, "2014-02-28 0800")
-createTimeOutEvent(empRecord, "2014-02-28 1400")
+createTimeInEvent(empRecord, "2014-02-28 0830")
+createTimeOutEvent(empRecord, "2014-02-28 1445")
 hoursWorkedOnDate(empRecord, "2014-02-28")
 wagesEarnedOnDate(empRecord, "2014-02-28")
 
